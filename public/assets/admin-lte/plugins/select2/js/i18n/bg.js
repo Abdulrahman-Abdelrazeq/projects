@@ -1,0 +1,5 @@
+Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [03/Jul/2022:10:08:37 +0200] "GET /abosamra/assets/admin-lte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js HTTP/1.1" 200 41854 "http://localhost/abosamra/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [03/Jul/2022:10:08:37 +0200] "GET /abosamra/assets/admin-lte/dist/js/adminlte.js HTTP/1.1" 200 46881 "http://localhost/abosamra/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [03/Jul/2022:10:08:37 +0200] "GET /abosamra/assets/admin-lte/dist/js/pages/dashboard.js HTTP/1.1" 200 7843 "http://localhost/abosamra/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [03/Jul/2022:10:08:37 +0200] "GET /abosa
