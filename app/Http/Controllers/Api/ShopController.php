@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ListShopResource;
+use App\Models\Ad;
 use App\Models\Instruction;
 use App\Models\Shop;
 use Carbon\Carbon;
@@ -102,6 +103,33 @@ class ShopController extends Controller
             'status' => true,
             'data' => $data,
         ]);
+    }
+
+    public function ads()
+    {
+        $ads = Ad::active()->orderBy('order', 'asc')->latest('id')->get()->map(function ($ad) {
+            return [
+                'id' => $ad->id,
+                'title' => $ad->title,
+                'image' => asset('storage/' . $ad->image),
+                'link' => $ad->link,
+                'order' => $ad->order,
+                'active' => $ad->active,
+            ];
+        });
+
+        if ($ads->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'لا يوجد إعلانات حالياً',
+                'data' => []
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $ads
+        ], 200);
     }
 
     /**

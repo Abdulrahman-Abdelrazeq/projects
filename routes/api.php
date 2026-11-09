@@ -18,6 +18,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'Api'], function(){
 
     Route::get('/list-shops', 'ShopController@list');
     Route::get('/list-instructions', 'ShopController@instructions');
+    Route::get('/list-ads', 'ShopController@ads');
     Route::match(['get', 'post'], '/check-expired-subscriptions', 'ShopController@checkExpiredSubscriptions');
 
 });
