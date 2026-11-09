@@ -7,6 +7,9 @@
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-calendar-check mr-1 text-primary"></i> إدارة الاشتراكات</h3>
                     <div class="card-tools">
+                        <a class="btn btn-outline-info btn-sm mr-1" href="{{ route('subscriptions.allHistory') }}">
+                            <i class="fas fa-archive"></i> أرشيف الاشتراكات
+                        </a>
                         <a class="btn btn-outline-success btn-sm" href="{{ route('subscriptions.create') }}">
                             <i class="fas fa-plus"></i> إضافة اشتراك
                         </a>
@@ -156,6 +159,10 @@
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
+                                            <a class="btn btn-secondary btn-xs" href="{{ route('subscriptions.history', $record->id) }}" title="سجل اشتراكات المحل">
+                                                <i class="fas fa-history"></i>
+                                            </a>
+
                                             <a class="btn btn-info btn-xs" href="{{ route('subscriptions.edit', $record->id) }}" title="تعديل">
                                                 <i class="fas fa-edit"></i>
                                             </a>

@@ -99,6 +99,30 @@
                     </ul>
                 </li>
 
+                <li class="nav-item has-treeview {{ request()->is('ads*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('ads*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-bullhorn"></i>
+                        <p>
+                            الإعلانات
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{route('ads.create')}}" class="nav-link {{ request()->is('ads/create') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>اضافة إعلان </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{route('ads.index')}}" class="nav-link {{ request()->is('ads') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>عرض الإعلانات </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
                 <li class="nav-item">
                     {!! Form::open(['method' => 'post', 'url' => url('logout'), 'id' => 'signoutSidebar']) !!}
                     {!! Form::close() !!}

@@ -74,7 +74,7 @@
             <label for="admin_link_api"><b>رابط الـ API الخاص بلوحة التحكم (لوحة التاجر)</b></label>
             {!! Form::text('admin_link_api', null, [
                 'class' => 'form-control input-lg',
-                'placeholder' => 'مثال: http://localhost/badrshop46/'
+                'placeholder' => 'مثال: http://localhost/badrshop/'
             ]) !!}
             <small class="form-text text-muted">الرابط المستخدم لمزامنة تاريخ انتهاء الاشتراك مع لوحة التاجر</small>
             @error('admin_link_api')

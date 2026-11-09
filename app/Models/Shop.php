@@ -48,6 +48,11 @@ class Shop extends Model
         return $endDateStr < date('Y-m-d');
     }
 
+    public function histories()
+    {
+        return $this->hasMany(SubscriptionHistory::class, 'shop_id')->orderBy('id', 'desc');
+    }
+
     /**
      * Get image URL
      */

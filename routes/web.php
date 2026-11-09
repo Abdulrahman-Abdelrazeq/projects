@@ -31,8 +31,13 @@ Route::group(['middleware' => ['auth:web'], 'namespace' => 'Admin'], function ()
     Route::resource('users', 'UserController');
     Route::resource('shops', 'ShopController');
     Route::resource('subscriptions', 'SubscriptionController');
+    Route::get('subscriptions/{id}/history', 'SubscriptionController@history')->name('subscriptions.history');
+    Route::post('subscriptions/{id}/history', 'SubscriptionController@storeHistory')->name('subscriptions.storeHistory');
+    Route::delete('subscriptions/history/{history_id}', 'SubscriptionController@destroyHistory')->name('subscriptions.destroyHistory');
+    Route::get('subscriptions-history', 'SubscriptionController@allHistory')->name('subscriptions.allHistory');
     Route::post('subscriptions/{id}/sync', 'SubscriptionController@syncNow')->name('subscriptions.sync');
     Route::resource('instructions', 'InstructionController');
+    Route::resource('ads', 'AdController');
     Route::get('/user/change-status/{id}', 'UserController@changeStatus')->name('user.changeStatus');
 });
 

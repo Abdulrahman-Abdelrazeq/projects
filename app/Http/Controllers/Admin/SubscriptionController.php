@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Shop;
+use App\Models\SubscriptionHistory;
 use App\Services\BadrSubscriptionService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -130,7 +131,16 @@ class SubscriptionController extends Controller
 
         $shop = Shop::create($data);
 
-        // Sync with merchant control panel (badrshop46)
+        // Record in subscription history
+        $shop->histories()->create([
+            'start_date' => $shop->start_date,
+            'end_date' => $shop->end_date,
+            'shop_type' => $shop->shop_type,
+            'status' => $shop->active == 1 ? 'مفعل' : 'غير مفعل',
+            'notes' => 'تسجيل اشتراك جديد للمحل',
+        ]);
+
+        // Sync with merchant control panel (badrshop)
         // If inactive, send null to set run_date = NULL in badr_shop
         $syncNotice = '';
         if (!empty($shop->admin_link_api)) {
@@ -209,9 +219,27 @@ class SubscriptionController extends Controller
         $isLive = ($data['active'] == 1 && Carbon::parse($data['end_date'])->endOfDay()->isFuture()) ? 1 : 0;
         $data['is_live'] = $isLive;
 
+        $oldStartDate = $record->start_date ? Carbon::parse($record->start_date)->format('Y-m-d') : null;
+        $oldEndDate = $record->end_date ? Carbon::parse($record->end_date)->format('Y-m-d') : null;
+        $oldActive = $record->active;
+
         $record->update($data);
 
-        // Sync with merchant control panel (badrshop46)
+        // Record in subscription history if dates or status changed
+        $newStartDate = $record->start_date ? Carbon::parse($record->start_date)->format('Y-m-d') : null;
+        $newEndDate = $record->end_date ? Carbon::parse($record->end_date)->format('Y-m-d') : null;
+
+        if ($oldStartDate !== $newStartDate || $oldEndDate !== $newEndDate || $oldActive != $record->active) {
+            $record->histories()->create([
+                'start_date' => $record->start_date,
+                'end_date' => $record->end_date,
+                'shop_type' => $record->shop_type,
+                'status' => $record->active == 1 ? 'مفعل' : 'غير مفعل',
+                'notes' => 'تحديث / تجديد الاشتراك',
+            ]);
+        }
+
+        // Sync with merchant control panel (badrshop)
         // If inactive, send null to set run_date = NULL in badr_shop
         $syncNotice = '';
         if (!empty($record->admin_link_api)) {
@@ -277,5 +305,101 @@ class SubscriptionController extends Controller
         }
 
         return redirect()->back()->with('error', 'فشلت المزامنة: ' . ($res['message'] ?? 'تعذر الاتصال'));
+    }
+
+    /**
+     * View subscription history for a single shop
+     */
+    public function history($id)
+    {
+        $shop = Shop::subscriptions()->findOrFail($id);
+        $records = $shop->histories()->latest('id')->paginate(15);
+
+        return $this->view('history', compact('shop', 'records'));
+    }
+
+    /**
+     * Manually add a subscription period to a shop's history log
+     */
+    public function storeHistory(Request $request, $id)
+    {
+        $shop = Shop::subscriptions()->findOrFail($id);
+
+        $rules = [
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'shop_type' => 'nullable|string',
+            'amount' => 'nullable|numeric|min:0',
+            'status' => 'nullable|string',
+            'notes' => 'nullable|string',
+        ];
+
+        $this->validate($request, $rules);
+
+        $history = $shop->histories()->create([
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'shop_type' => $request->shop_type ?: $shop->shop_type,
+            'amount' => $request->amount ?: 0,
+            'status' => $request->status ?: 'مفعل',
+            'notes' => $request->notes ?: 'إضافة يدوية إلى السجل',
+        ]);
+
+        // If requested to update current subscription dates on the shop
+        if ($request->has('update_shop_current') && $request->update_shop_current == 1) {
+            $shop->update([
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'is_live' => ($shop->active == 1 && Carbon::parse($request->end_date)->endOfDay()->isFuture()) ? 1 : 0
+            ]);
+
+            // Sync with badrshop
+            if (!empty($shop->admin_link_api) && $shop->active == 1) {
+                BadrSubscriptionService::syncSubscription(
+                    $shop->admin_link_api,
+                    $shop->shop_code,
+                    Carbon::parse($shop->end_date)->format('Y-m-d')
+                );
+            }
+        }
+
+        return redirect()->back()->with('success', 'تم إضافة فترة الاشتراك إلى سجل المحل بنجاح');
+    }
+
+    /**
+     * Delete a single subscription history log entry
+     */
+    public function destroyHistory($history_id)
+    {
+        $history = SubscriptionHistory::findOrFail($history_id);
+        $shopId = $history->shop_id;
+        $history->delete();
+
+        return redirect()->back()->with('success', 'تم حذف سجل الاشتراك بنجاح');
+    }
+
+    /**
+     * View all subscription history entries across all shops
+     */
+    public function allHistory(Request $request)
+    {
+        $query = SubscriptionHistory::with('shop');
+
+        if ($request->filled('shop_id')) {
+            $query->where('shop_id', $request->shop_id);
+        }
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('start_date', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('end_date', '<=', $request->end_date);
+        }
+
+        $records = $query->latest('id')->paginate($request->input('per_page', 20))->appends($request->all());
+        $shops = Shop::subscriptions()->pluck('shop_name', 'id');
+
+        return $this->view('all_history', compact('records', 'shops'));
     }
 }
