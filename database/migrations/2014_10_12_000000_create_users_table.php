@@ -19,8 +19,11 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->boolean('enabled')->default(1);
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
+            $table->boolean('can_open_cash_point')->default(1);
         });
     }
 
@@ -34,3 +37,4 @@ class CreateUsersTable extends Migration
         Schema::dropIfExists('users');
     }
 }
+

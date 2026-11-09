@@ -16,26 +16,26 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('auth.login');
 });
+
 Auth::routes();
-  Route::get('/linkstorage', function () {
+
+Route::get('/linkstorage', function () {
     Artisan::call('storage:link');
-    return Artisan::output();
-        Artisan::call('config:cache');
-
+    Artisan::call('config:cache');
     Artisan::call('cache:clear');
-
     Artisan::call('optimize:clear');
-
+    return Artisan::output();
 });
-Route::group(['middleware' => ['auth:web'],'namespace' => 'Admin'], function () {
-    
 
+Route::group(['middleware' => ['auth:web'], 'namespace' => 'Admin'], function () {
     Route::resource('users', 'UserController');
     Route::resource('shops', 'ShopController');
+    Route::resource('subscriptions', 'SubscriptionController');
+    Route::post('subscriptions/{id}/sync', 'SubscriptionController@syncNow')->name('subscriptions.sync');
     Route::resource('instructions', 'InstructionController');
     Route::get('/user/change-status/{id}', 'UserController@changeStatus')->name('user.changeStatus');
-
 });
+
 Route::get('/home', 'HomeController@index')->name('home');
 
 

@@ -26,11 +26,13 @@ class ShopController extends Controller
 
     public function index(Request $request)
     {
-        $records = $this->model->where(function ($query) use ($request) {
+        $records = $this->model->regularShops()->where(function ($query) use ($request) {
             if ($request->name) {
-                $query->where('id', $request->name);
+                $query->where('shop_name', 'LIKE', '%' . $request->name . '%')
+                      ->orWhere('shop_code', 'LIKE', '%' . $request->name . '%');
             }
-        })->paginate($request->input('per_page'));
+        })->latest()->paginate($request->input('per_page', 15));
+
         return $this->view('index', compact('records'));
     }
 
@@ -68,6 +70,8 @@ class ShopController extends Controller
             );
             $data['image'] = $imagePath;
         }
+        $data['subscription'] = 0;
+        $data['is_live'] = isset($data['active']) && $data['active'] == 1 ? 1 : 0;
         $shop = Shop::create($data);
         session()->flash('success', __('تم اضافه المحل بنجاح'));
         return redirect(route('shops.index'));
@@ -75,17 +79,16 @@ class ShopController extends Controller
 
     public function edit($id)
     {
-        $record = Shop::find($id);
+        $record = Shop::regularShops()->findOrFail($id);
         return $this->view('edit', compact('record'));
     }
 
     public function update(Request $request, $id)
     {
-        $record = Shop::find($id);
+        $record = Shop::regularShops()->findOrFail($id);
         $rules = [
             'shop_name' => 'required',
             'shop_code' => 'required|numeric|unique:shops,shop_code,' . $id,
-//            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'link_api' => 'required',
             'address' => 'required',
         ];
@@ -93,14 +96,13 @@ class ShopController extends Controller
             'shop_name.required' => 'يرجي ادخال اسم المحل',
             'shop_code.required' => 'يرجي ادخال كود الدعم ',
             'shop_code.unique' => 'كود الدعم موجود بالفعل ',
-//            'image.required' => 'يرجي ادخال صوره المحل ',
             'address.required' => 'يرجي ادخال عنوان المحل ',
             'link_api.required' => 'يرجي ادخال رابط ال api ',
         ]);
 
         $this->validate($request, $rules, $messages);
         $data = $request->except('image');
-        // dd($data);
+
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->storeAs(
                 'shops/' . date('Y-m'),
@@ -109,11 +111,17 @@ class ShopController extends Controller
             );
             $data['image'] = $imagePath;
         }
-        $data['is_live'] = $data['active'] == 1 ? 1 : 0;
+        $data['is_live'] = isset($data['active']) && $data['active'] == 1 ? 1 : 0;
         $record->update($data);
         return redirect(route('shops.index'))
             ->with('success', 'تم تحديث المحل بنجاح');
     }
 
-
+    public function destroy($id)
+    {
+        $record = Shop::regularShops()->findOrFail($id);
+        $record->delete();
+        return redirect(route('shops.index'))
+            ->with('success', 'تم حذف المحل بنجاح');
+    }
 }
