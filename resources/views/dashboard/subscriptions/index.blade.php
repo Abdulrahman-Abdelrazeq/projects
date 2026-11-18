@@ -5,7 +5,7 @@
         <div class="col-md-12">
             <div class="card card-default">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-calendar-check mr-1 text-primary"></i> إدارة الاشتراكات</h3>
+                    <h3 class="card-title"><i class="fas fa-calendar-check mr-1 text-primary"></i> إدارة الاشتراكات (تطبيق مايو مول)</h3>
                     <div class="card-tools">
                         <a class="btn btn-outline-info btn-sm mr-1" href="{{ route('subscriptions.allHistory') }}">
                             <i class="fas fa-archive"></i> أرشيف الاشتراكات

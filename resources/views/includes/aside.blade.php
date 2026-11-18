@@ -45,13 +45,13 @@
                         <li class="nav-item">
                             <a href="{{route('subscriptions.index')}}" class="nav-link {{ request()->is('subscriptions*') && !request()->is('subscriptions/create') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon text-warning"></i>
-                                <p>الاشتراكات </p>
+                                <p>الاشتراكات (تطبيق مايو مول)</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{route('subscriptions.create')}}" class="nav-link {{ request()->is('subscriptions/create') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon text-success"></i>
-                                <p>اضافة اشتراك </p>
+                                <p>اضافة اشتراك (تطبيق مايو مول) </p>
                             </a>
                         </li>
                     </ul>

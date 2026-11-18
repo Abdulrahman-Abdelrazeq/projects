@@ -5,7 +5,7 @@
         <div class="col-md-12">
             <div class="card card-default">
                 <div class="card-header">
-                    <h3 class="card-title">إضافة اشتراك جديد</h3>
+                    <h3 class="card-title">إضافة اشتراك جديد (تطبيق مايو مول)</h3>
                     <div class="card-tools">
                         <a href="{{ route('subscriptions.index') }}" class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-arrow-right"></i> رجوع لجدول الاشتراكات
